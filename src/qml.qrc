@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>images/arrow_right.png</file>
+        <file>images/arrow_left.png</file>
+        <file>images/arrow_rotate_left.png</file>
+        <file>images/arrow_rotate_right.png</file>
+        <file>images/default.png</file>
+        <file>images/erase.png</file>
+        <file>images/logo_oficiall_cut.jpg</file>
+        <file>images/warning.png</file>
+        <file>images/video_rewind.png</file>
+        <file>images/video_play.png</file>
+        <file>images/video_pause.png</file>
+        <file>images/video_forward.png</file>
+        <file alias="qtquickcontrols2.conf">qtquickcontrols2.conf</file>
+        <file>qmldir/MyFileDialog.qml</file>
+        <file>qmldir/MyFolderDialog.qml</file>
+        <file>qmldir/MyTabBar.qml</file>
+        <file>qmldir/MyStackLayout.qml</file>
+        <file>qmldir/MyTableView.qml</file>
+        <file>qmldir/MySequenceDialog.qml</file>
+        <file>qmldir/MySequenceControls.qml</file>
+        <file>qmldir/MyImageControls.qml</file>
+        <file>qmldir/TempRect.qml</file>
+        <file>qmldir/AuthDialog.qml</file>
+    </qresource>
+</RCC>
