@@ -20,7 +20,7 @@ Window {
     maximumWidth: width
     minimumHeight: height
     maximumHeight: height
-    title: qsTr("WT-Lib - Sample 0.1.2")
+    title: qsTr("WWP Data SDK - Sample 0.2.0")
 
     property int infoVisibility: 1
     property bool imageToolTipVisibility: if(1) true;
@@ -185,7 +185,7 @@ Window {
                                 id: dragArea
                                 anchors.fill: parent
                                 drag.target: parent
-                                cursorShape: Qt.OpenHandCursor
+                                cursorShape: Qt.CrossCursor
                                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                                 hoverEnabled: true
                                 enabled: false
@@ -196,18 +196,11 @@ Window {
                                     //Temp Rect update
                                     var coords = getPhotoCoords()
                                     var raw;
-                                    if(_backend.isRadiometricSourceLoaded())
+                                    if(_backend.isSourceLoaded())
                                     {
-                                        tempRect.changeMode(true);
                                         var temp =  (_backend.getPhotoPointer() !== -1) ? _backend.getTemperature(coords[0], coords[1]).toFixed(2) : ""
                                         raw  = (_backend.getPhotoPointer() !== -1) ? _backend.getRawRadiometricValue(coords[0], coords[1]) : ""
                                         tempRect.setParams(temp, raw, coords[0].toFixed(0), coords[1].toFixed(0))
-                                    }
-                                    else
-                                    {
-                                        tempRect.changeMode(false);
-                                        raw =  (_backend.getPhotoPointer() !== -1) ? _backend.getRawSignalValue(coords[0], coords[1]).toFixed(0) : ""
-                                        tempRect.setParams(0, raw, coords[0].toFixed(0), coords[1].toFixed(0))
                                     }
                                 }
                                 onClicked: {
@@ -437,20 +430,12 @@ Window {
             //Temp Rect update
             var coords = getPhotoCoords()
             var raw;
-            if(_backend.isRadiometricSourceLoaded())
+            if(_backend.isSourceLoaded())
             {
                 unitLabel.text = "[ °C ]"
-                tempRect.changeMode(true);
                 var temp =  (_backend.getPhotoPointer() !== -1) ? _backend.getTemperature(coords[0], coords[1]).toFixed(2) : ""
                 raw  = (_backend.getPhotoPointer() !== -1) ? _backend.getRawRadiometricValue(coords[0], coords[1]) : ""
                 tempRect.setParams(temp, raw, coords[0].toFixed(0), coords[1].toFixed(0))
-            }
-            else
-            {
-                unitLabel.text = "signal"
-                tempRect.changeMode(false);
-                raw =  (_backend.getPhotoPointer() !== -1) ? _backend.getRawSignalValue(coords[0], coords[1]).toFixed(0) : ""
-                tempRect.setParams(0, raw, coords[0].toFixed(0), coords[1].toFixed(0))
             }
         }
         onPhotoDeleted:

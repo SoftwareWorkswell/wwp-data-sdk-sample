@@ -14,14 +14,6 @@ bool Backend::isSourceLoaded() {
         return false;
 }
 
-bool Backend::isRadiometricSourceLoaded()
-{
-    if(!(m_urls.isEmpty()) && image)
-        return image->isRadiometricImage();
-    else
-        return false;
-}
-
 bool Backend::containsGPSData()
 {
     if(!image)
@@ -46,7 +38,7 @@ void Backend::makeFileData(QList<QUrl> newContent) {
         newUrl = newContent[i].path().remove(0,1);
 #endif
         QString newString = newUrl.fileName();
-        if(!newString.contains(".wseq") && ! newString.contains(".seq")  && !wtl::Center::isRadiometricImage(newUrl.path().toStdString()) && !wtl::Center::isRawImage(newUrl.path().toStdString()))
+        if(!newString.contains(".wseq") && ! newString.contains(".seq")  && !wtl::Center::isRadiometricImage(newUrl.path().toStdString()))
         {
             qDebug() << "not a radiometric image" << newUrl.path();
             emit sourceError();
@@ -85,7 +77,7 @@ void Backend::makeFolderData(QString newContent) {
     for(int i = 0; i < newList.size(); i++) {
         QString newString = newList[i];
         QString newUrl = m_folder->filePath(newString);
-        if(!wtl::Center::isRadiometricImage(newUrl.toStdString()) && !wtl::Center::isRawImage(newUrl.toStdString()))
+        if(!wtl::Center::isRadiometricImage(newUrl.toStdString()))
         {
             emit sourceError();
             continue;
@@ -182,8 +174,6 @@ void Backend::loadSequence() {
 
     if(m_urls[m_photoPointer].contains(".wseq"))
         m_Sequence = wtl::Center::loadSequenceRadiometric(m_urls[m_photoPointer].toStdString());
-    else if (m_urls[m_photoPointer].contains(".seq"))
-        m_Sequence = wtl::Center::loadSequenceRaw(m_urls[m_photoPointer].toStdString());
     else
        return;
     if(!m_Sequence)
@@ -329,12 +319,6 @@ void Backend::loadImage() {
         image.reset();
         image = wtl::Center::loadImageRadiometric(m_urls[m_photoPointer].toStdString());
     }
-    else if(wtl::Center::isRawImage(m_urls[m_photoPointer].toStdString()))
-    {
-        qDebug() << "raw image";
-        image.reset();
-        image = wtl::Center::loadImageRaw(m_urls[m_photoPointer].toStdString());
-    }
     else
     {
         emit sourceError();
@@ -349,12 +333,7 @@ void Backend::exportThermalImage(const QString & path)
 {
     if(!image)
         return;
-    if(image->isRadiometricImage())
-    {
-        qDebug() << "saving" << path << wtl::Center::saveImageRadiometric(std::static_pointer_cast<wtl::ImageRadiometric>(image), path.toStdString());
-    }
-    else
-        qDebug() << "saving" << path << wtl::Center::saveImageRaw(std::static_pointer_cast<wtl::ImageRaw>(image), path.toStdString());
+    qDebug() << "saving" << path << wtl::Center::saveImageRadiometric(std::static_pointer_cast<wtl::ImageRadiometric>(image), path.toStdString());
 }
 
 void Backend::exportBasicImage(const QString & path)
@@ -379,44 +358,21 @@ void Backend::newPalette(QString newPalette)
 
 //Temperature scale
 float Backend::getTemperature(int x, int y) {
-
-    if(image && image->isRadiometricImage())
-        return static_cast<wtl::ImageRadiometric*>(image.get())->getTemperature(x, y);
-    else
-        return 0.0;
+    return static_cast<wtl::ImageRadiometric*>(image.get())->getTemperature(x, y);
 }
 
 int Backend::getRawRadiometricValue(float x, float y) {
-    if(image && image->isRadiometricImage())
-        return (int) static_cast<wtl::ImageRadiometric*>(image.get())->getRawRadiometricValue((int) x, (int) y);
-    else
-        return 0.0;
-}
-
-int Backend::getRawSignalValue(float x, float y) {
-    if(!image || image->isRadiometricImage())
-        return 0.0;
-    else
-    {
-        int res =  (int) static_cast<wtl::ImageRaw*>(image.get())->getRawSignalValue((int) x, (int) y);
-        return res;
-    }
+    return (int) static_cast<wtl::ImageRadiometric*>(image.get())->getRawRadiometricValue((int) x, (int) y);
 }
 
 QStringList Backend::getTemperatureScale() {
 
     float max;
     float min;
-    if(image->isRadiometricImage())
-    {
-        max = static_cast<wtl::ImageRadiometric*>(image.get())->getMaxTemperature();
-        min = static_cast<wtl::ImageRadiometric*>(image.get())->getMinTemperature();
-    }
-    else
-    {
-        max = static_cast<wtl::ImageRaw*>(image.get())->getMaxSignalValue();
-        min = static_cast<wtl::ImageRaw*>(image.get())->getMinSignalValue();
-    }
+
+    max = static_cast<wtl::ImageRadiometric*>(image.get())->getMaxTemperature();
+    min = static_cast<wtl::ImageRadiometric*>(image.get())->getMinTemperature();
+
     float step = (max - min) / 10;
     float last = max;
     std::string s[11];
@@ -477,8 +433,6 @@ void Backend::setMinTemperature(float newVal)
     {
         if(image->isRadiometricImage())
             static_cast<wtl::ImageRadiometric*>(image.get())->setManualMin(newVal);
-        else
-            static_cast<wtl::SequenceRaw*>(m_Sequence.get())->setManualMin(newVal);
         emit photoChanged();
     }
 }
@@ -489,16 +443,12 @@ void Backend::setMaxTemperature(float newVal)
     {
         if(m_Sequence->isRadiometricSequence())
              static_cast<wtl::SequenceRadiometric*>(m_Sequence.get())->setManualMin(newVal);
-        else
-             static_cast<wtl::SequenceRaw*>(m_Sequence.get())->setManualMax(newVal);
         refreshSequenceFrame();
     }
     else if(image)
     {
         if(image->isRadiometricImage())
             static_cast<wtl::ImageRadiometric*>(image.get())->setManualMax(newVal);
-        else
-            static_cast<wtl::ImageRaw*>(image.get())->setManualMax((uint8_t)newVal);
         emit photoChanged();
     }
 }

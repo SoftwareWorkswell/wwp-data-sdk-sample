@@ -12,19 +12,6 @@ Rectangle {
         xpos.text = x
         ypos.text = y
     }
-    // change mode of temp rext = radiometric shows temp, raw signal values
-    function changeMode(radiometric)
-    {
-        if(radiometric)
-        {
-            tempLabel.visible = tempText.visible = true
-        }
-        else
-        {
-            tempLabel.visible = tempText.visible = false
-
-        }
-    }
 
     RowLayout {
         width: parent.width

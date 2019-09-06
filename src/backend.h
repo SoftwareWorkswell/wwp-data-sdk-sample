@@ -62,7 +62,6 @@ signals:
 public slots:
     //Images
     bool isSourceLoaded();
-    bool isRadiometricSourceLoaded();
     bool containsGPSData();
     void makeFileData(QList<QUrl> newContent);
     void makeFolderData(QString content);
@@ -91,14 +90,13 @@ public slots:
 
     //Image loading & setting plalettes
     void loadImage();
-    void exportThermalImage(const QString & path); // save as radiom/raw
+    void exportThermalImage(const QString & path); // save as radiometric
     void exportBasicImage(const QString & path); // save as basic jpeg
     void newPalette(QString newPalette);
 
     //Temperature scale
     float getTemperature(int x, int y); // for radiometric
     int getRawRadiometricValue(float x, float y); // for radiometric
-    int getRawSignalValue(float x, float y); // for raw
     QStringList getTemperatureScale();
     void setManualRangeOn();
     void setManualRangeOff();

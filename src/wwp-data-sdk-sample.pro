@@ -33,8 +33,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 # Link your wwp-data-sdk here
-# INCLUDEPATH += 
-# LIBS += 
+INCLUDEPATH += 
+LIBS += 
 
 HEADERS += \
     backend.h \
