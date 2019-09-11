@@ -33,8 +33,21 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 # Link your wwp-data-sdk here
-INCLUDEPATH += 
-LIBS += 
+win32 {
+  INCLUDEPATH += "E:\Martin\WWPDataSDK\wt-lib\WT-lib"
+  INCLUDEPATH += "E:\Martin\WWPDataSDK\wt-lib\WT-lib\libs\headers"
+  INCLUDEPATH += "E:\Martin\C++ Boost Library\boost_1_70_0"
+  LIBS += -L"E:\Martin\WWPDataSDK\wt-lib\build-WT-lib-Desktop_Qt_5_12_4_MSVC2017_64bit-Release\release" -lwwp-data-sdk
+  LIBS += -L"E:\Martin\WWPDataSDK\wt-lib\WT-lib\libs\win" -llibjpeg -llibboost_date_time-vc141-mt-x64-1_70 -llibboost_regex-vc141-mt-x64-1_70
+}
+macx {
+  INCLUDEPATH += "/Users/Workswell/Matej/Repos/wwp-data-sdk/wt-lib/WT-Lib"
+  INCLUDEPATH += "/Users/Workswell/Matej/Repos/wwp-data-sdk/wt-lib/WT-Lib/libs/headers"
+  INCLUDEPATH += "/Users/Workswell/Matej/Dev/Boost_1_70_0"
+
+  LIBS += -L"$$_PRO_FILE_PWD_" -lwwp-data-sdk
+  LIBS += -L"/Users/Workswell/Matej/Repos/wwp-data-sdk/wt-lib/WT-Lib/libs/macOS/" -ljpeg -lexif
+}
 
 HEADERS += \
     backend.h \

@@ -73,7 +73,8 @@ public slots:
     void deleteAll();
     int getPhotoPointer();
     void setPhotoPointer(int newValue);
-
+    // force emit of photochanged signal to refresh photo using provider
+    void forcePhotoChanged();
     //Sequences
     bool isSequenceLoaded();
     void loadSequence();
@@ -100,9 +101,14 @@ public slots:
     QStringList getTemperatureScale();
     void setManualRangeOn();
     void setManualRangeOff();
+    // setters for ranges
     void setMinTemperature(float newVal);
     void setMaxTemperature(float newVal);
 
+    void addAlarmAbove(float val, QColor color);
+    void addAlarmBelow(float val, QColor color);
+    void addAlarmInterval(float upperVal, float lowerVal, QColor color);
+    void addAlarmInvInterval(float upperVal, float lowerVal, QColor color);
     //Source info
     QString getCaptureTime();
     QString getResolution();
@@ -117,6 +123,9 @@ public slots:
     int getSequenceFramerate();
     int getSequenceTotalFrames();
     int getSequenceDuration();
+
+    double getMaxImageTemp();
+    double getMinImageTemp();
 
     void setEmissivity(double newVal);
     void setReflectedTemp(double newVal);

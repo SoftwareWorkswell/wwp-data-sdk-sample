@@ -3,8 +3,8 @@ import QtQuick.Controls 2.4
 
 TabBar {
     TabButton {
-        text: "Source Info"
-        implicitWidth: 130
+        text: "Info"
+        implicitWidth: 70
     }
     TabButton {
         id: theLongest
@@ -12,7 +12,11 @@ TabBar {
         width: 140
     }
     TabButton {
-        text: "GPS Info"
+        text: "GPS"
+        width: 60
+    }
+    TabButton {
+        text: "Alarm"
         width: 90
     }
 }

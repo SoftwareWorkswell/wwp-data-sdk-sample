@@ -169,6 +169,11 @@ void Backend::setPhotoPointer(int newValue) {
         loadImage();
 }
 
+void Backend::forcePhotoChanged()
+{
+    emit photoChanged();
+}
+
 //Sequences
 void Backend::loadSequence() {
 
@@ -453,6 +458,132 @@ void Backend::setMaxTemperature(float newVal)
     }
 }
 
+void Backend::addAlarmAbove(float val, QColor color)
+{
+    std::shared_ptr<wtl::AlarmStruct> alarm(new wtl::AlarmStruct);
+    alarm->m_Type = wtl::AlarmType::Above;
+    alarm->m_UpperValue = alarm->m_LowerValue = val;
+    alarm->m_Color[0] = color.red();
+    alarm->m_Color[1] = color.green();
+    alarm->m_Color[2] = color.blue();
+    if(m_SequenceLoaded)
+    {
+        if(m_Sequence->isRadiometricSequence())
+        {
+            wtl::SequenceRadiometric * radSeq = static_cast<wtl::SequenceRadiometric*>(m_Sequence.get());
+            if(radSeq->getAlarms()->getAlarmCount() != 0)
+                radSeq->getAlarms()->clear();
+            radSeq->addAlarmToSequence(alarm);
+            refreshSequenceFrame();
+        }
+    }
+    else
+    {
+        if((!image) || !image->isRadiometricImage())
+            return;
+        wtl::ImageRadiometric * radImg = static_cast<wtl::ImageRadiometric*>(image.get());
+        if(radImg->getAlarms()->getAlarmCount() !=0)
+            radImg->getAlarms()->clear();
+        radImg->addAlarmToImage(alarm);
+        emit photoChanged();
+    }
+}
+
+void Backend::addAlarmBelow(float val, QColor color)
+{
+    std::shared_ptr<wtl::AlarmStruct> alarm(new wtl::AlarmStruct);
+    alarm->m_Type = wtl::AlarmType::Below;
+    alarm->m_UpperValue = alarm->m_LowerValue = val;
+    alarm->m_Color[0] = color.red();
+    alarm->m_Color[1] = color.green();
+    alarm->m_Color[2] = color.blue();
+    if(m_SequenceLoaded)
+    {
+        if(m_Sequence->isRadiometricSequence())
+        {
+            wtl::SequenceRadiometric * radSeq = static_cast<wtl::SequenceRadiometric*>(m_Sequence.get());
+            if(radSeq->getAlarms()->getAlarmCount() != 0)
+                radSeq->getAlarms()->clear();
+            radSeq->addAlarmToSequence(alarm);
+            refreshSequenceFrame();
+        }
+    }
+    else
+    {
+        if((!image) || !image->isRadiometricImage())
+            return;
+        wtl::ImageRadiometric * radImg = static_cast<wtl::ImageRadiometric*>(image.get());
+        if(radImg->getAlarms()->getAlarmCount() != 0)
+            radImg->getAlarms()->clear();
+        radImg->addAlarmToImage(alarm);
+        emit photoChanged();
+    }
+}
+
+void Backend::addAlarmInterval(float upperVal, float lowerVal, QColor color)
+{
+    std::shared_ptr<wtl::AlarmStruct> alarm(new wtl::AlarmStruct);
+    alarm->m_Type = wtl::AlarmType::Interval;
+    alarm->m_UpperValue = upperVal;
+    alarm->m_LowerValue = lowerVal;
+    alarm->m_Color[0] = color.red();
+    alarm->m_Color[1] = color.green();
+    alarm->m_Color[2] = color.blue();
+    if(m_SequenceLoaded)
+    {
+        if(m_Sequence->isRadiometricSequence())
+        {
+            wtl::SequenceRadiometric * radSeq = static_cast<wtl::SequenceRadiometric*>(m_Sequence.get());
+            if(radSeq->getAlarms()->getAlarmCount() != 0)
+                radSeq->getAlarms()->clear();
+            radSeq->addAlarmToSequence(alarm);
+            refreshSequenceFrame();
+        }
+    }
+    else
+    {
+        if((!image) || !image->isRadiometricImage())
+            return;
+        wtl::ImageRadiometric * radImg = static_cast<wtl::ImageRadiometric*>(image.get());
+        if(radImg->getAlarms()->getAlarmCount() != 0)
+            radImg->getAlarms()->clear();
+        radImg->addAlarmToImage(alarm);
+        emit photoChanged();
+    }
+}
+
+void Backend::addAlarmInvInterval(float upperVal, float lowerVal, QColor color)
+{
+    std::shared_ptr<wtl::AlarmStruct> alarm(new wtl::AlarmStruct);
+    alarm->m_Type = wtl::AlarmType::InvertedInterval;
+    alarm->m_UpperValue = upperVal;
+    alarm->m_LowerValue = lowerVal;
+    alarm->m_Color[0] = color.red();
+    alarm->m_Color[1] = color.green();
+    alarm->m_Color[2] = color.blue();
+    if(m_SequenceLoaded)
+    {
+        if(m_Sequence->isRadiometricSequence())
+        {
+            wtl::SequenceRadiometric * radSeq = static_cast<wtl::SequenceRadiometric*>(m_Sequence.get());
+            if(radSeq->getAlarms()->getAlarmCount() != 0)
+                radSeq->getAlarms()->clear();
+            radSeq->addAlarmToSequence(alarm);
+            refreshSequenceFrame();
+        }
+    }
+    else
+    {
+        if((!image) || !image->isRadiometricImage())
+            return;
+        wtl::ImageRadiometric * radImg = static_cast<wtl::ImageRadiometric*>(image.get());
+        if(radImg->getAlarms()->getAlarmCount() != 0)
+            radImg->getAlarms()->clear();
+        radImg->addAlarmToImage(alarm);
+        emit photoChanged();
+    }
+}
+
 //Source info
 QString Backend::getCaptureTime() {
 
@@ -460,7 +591,6 @@ QString Backend::getCaptureTime() {
     struct tm *tm = localtime(&t);
     char date[20];
     strftime(date, sizeof(date), "%Y-%m-%d", tm);
-
     return date;
 }
 
@@ -530,8 +660,28 @@ int Backend::getSequenceDuration() {
     if(!m_SequenceLoaded) return 0; return m_Sequence->getSequenceMetaData().getDuration();
 }
 
+double Backend::getMaxImageTemp()
+{
+    if(image && image->isRadiometricImage())
+        return static_cast<wtl::ImageRadiometric*>(image.get())->getMaxTemperature();
+    else
+        return 0.0;
+}
+
+
+double Backend::getMinImageTemp()
+{
+    if(image && image->isRadiometricImage())
+        return static_cast<wtl::ImageRadiometric*>(image.get())->getMinTemperature();
+    else
+        return 0.0;
+}
+
+
 void Backend::setEmissivity(double newVal) {
-    if(image->isRadiometricImage())
+    if(m_SequenceLoaded && m_Sequence->isRadiometricSequence())
+        static_cast<wtl::SequenceRadiometric*>(m_Sequence.get())->setEmissivity(newVal);
+    else if(image->isRadiometricImage())
         static_cast<wtl::ImageRadiometric*>(image.get())->setEmissivity(newVal);
     emit photoChanged();
 }
@@ -706,3 +856,4 @@ void Backend::deactivate() {
     this->authentification();
     emit deactivated();
 }
+

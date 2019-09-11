@@ -1,10 +1,16 @@
 import QtQuick 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 1.4
+import QtQuick.Dialogs 1.2
 
 import Components 1.0
 
 StackLayout {
+    function crossesActivated()
+    {
+        return crossCheckBox.checked;
+    }
+
     Item {
         id: imageTab
         Layout.fillHeight: parent
@@ -32,6 +38,10 @@ StackLayout {
                 Label { text: "Object distance"; color: "black" }
                 Label { text: "Humidity"; color: "black" }
                 Label { text: "Extern optic trans"; color: "black" }
+                Text  { text: ""; font.bold: true }
+                Label { text: "Max Temp"; color: "black" }
+                Label { text: "Min Temp"; color: "black" }
+                Label { text: "Show mix/max cross"; color: "black" }
             }
             Item { Layout.preferredWidth: 5 }
             ColumnLayout { //Text lines
@@ -97,6 +107,14 @@ StackLayout {
                         _backend.setExternOpticTrans(externOpticTrans.text)
                     }
                 }
+                Label { text: "" }
+                Label { id: minTemp; color: "black"; text: "-"  }
+                Label { id: maxTemp; color: "black"; text: "-"  }
+                CheckBox{
+                    id: crossCheckBox
+                    onClicked: _backend.forcePhotoChanged();
+
+                }
             }
             Item { Layout.fillWidth: parent }
         }
@@ -155,6 +173,91 @@ StackLayout {
             Item { Layout.fillWidth: parent }
         }
     }
+    Item {
+        id: alarmsTab
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        RowLayout {
+            id: labelLayout4
+            anchors.fill: parent
+            anchors.margins: 10
+            anchors.topMargin: 60
+            ColumnLayout { //Labels
+                Layout.preferredWidth: 100
+                Layout.alignment: Qt.AlignTop
+                Label { text: "Alarm Type"; color: "black" }
+                Item { Layout.preferredWidth: 5 }
+                Label { id: topValLabel; text: "Value"; color: "black" }
+                Item { Layout.preferredWidth: 5 }
+                Label { id: lowerValLabel; text: "Lower Value"; color: "black" }
+                Item { Layout.preferredWidth: 5 }
+                Label { text: "Color"; color: "black" }
+            }
+            Item { Layout.preferredWidth: 5 }
+            ColumnLayout { //Text lines
+                Layout.preferredWidth: 100
+                Layout.alignment: Qt.AlignTop
+                ComboBox
+                {
+                    id: alarmTypeCB
+                    model: ["Above", "Below", "Interval", "Inverted Interval"]
+                    onCurrentIndexChanged:
+                    {
+                        if(currentIndex == 0 || currentIndex == 1)
+                        {
+                            alarmBottomVal.visible =lowerValLabel.visible = false
+                            topValLabel.text = "Value"
+                        }
+                        else
+                        {
+                            alarmBottomVal.visible =lowerValLabel.visible = true
+                            topValLabel.text = "Upper Value"
+                        }
+                    }
+                }
+                TextInput
+                {
+                    id: alarmTopVal; text: "-"
+                    selectByMouse: true
+                }
+                TextInput
+                {
+                    id: alarmBottomVal; text: "-"
+                    selectByMouse: true
+                }
+                Button
+                {
+                    text: "Choose"
+                    onClicked:
+                    {
+                        colorDialog.open()
+                    }
+                }
+                Item { Layout.preferredWidth: 5 }
+                Button
+                {
+                    text: "Apply"
+                    onClicked:{
+                        switch(alarmTypeCB.currentIndex)
+                        {
+                        case 0:
+                            _backend.addAlarmAbove(alarmTopVal.text, colorDialog.color); break;
+                        case 1:
+                            _backend.addAlarmBelow(alarmTopVal.text, colorDialog.color); break;
+                        case 2:
+                            _backend.addAlarmInterval(alarmTopVal.text, alarmBottomVal.text, colorDialog.color); break;
+                        case 4:
+                            _backend.addAlarmInvInterval(alarmTopVal.text, alarmBottomVal.text, colorDialog.color); break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    ColorDialog
+    {
+        id: colorDialog
+    }
 
     Connections {
         target: _backend
@@ -168,10 +271,7 @@ StackLayout {
                 imageName.text = _backend.getImageName(list.currentRow)
                 captureTime.text = _backend.getCaptureTime()
                 resolution.text = _backend.getResolution()
-                if(!_backend.isRadiometricSourceLoaded())
-                    clearThermalParams()
-                else
-                {
+
                 emissivity.text = _backend.getEmissivity().toFixed(3)
                 reflTemp.text = _backend.getReflectedTemp().toFixed(1)
                 atmTemp.text = _backend.getAtmTemp().toFixed(1)
@@ -179,7 +279,10 @@ StackLayout {
                 objectDistance.text = _backend.getObjectDistance().toFixed(1)
                 humidity.text = _backend.getHumidity().toFixed(3)
                 externOpticTrans.text = _backend.getExternOpticTrans().toFixed(1)
-                }
+
+                maxTemp.text = _backend.getMaxImageTemp().toFixed(1);
+                minTemp.text = _backend.getMinImageTemp().toFixed(1);
+
                 if(_backend.containsGPSData())
                 {
                     altitude.text = _backend.getAltitude()
@@ -225,6 +328,8 @@ StackLayout {
         objectDistance.text = "-"
         humidity.text = "-"
         externOpticTrans.text = "-"
+        maxTemp.text = "-"
+        minTemp.text = "-"
     }
     function clearSequenceParams()
     {
@@ -232,4 +337,5 @@ StackLayout {
         totalframes.text = "-"
         duration.text = "-"
     }
+
 }

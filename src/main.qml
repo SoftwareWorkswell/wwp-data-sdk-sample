@@ -21,7 +21,6 @@ Window {
     minimumHeight: height
     maximumHeight: height
     title: qsTr("WWP Data SDK - Sample 0.2.0")
-
     property int infoVisibility: 1
     property bool imageToolTipVisibility: if(1) true;
     property var temperatures: ["50", "40", "30", "20", "10", "0", "-10", "-20", "-30", "-40", "-50"];
@@ -42,7 +41,7 @@ Window {
     ColumnLayout {
         id:mainLayout
         anchors.fill: parent
-
+        enabled: false
         ////MENU
         RowLayout {
             id: menuBtnLayout
@@ -143,7 +142,7 @@ Window {
                     Layout.fillHeight: parent
 
                     MyTabBar { id: tabBar; anchors.fill: parent }
-                    MyStackLayout { anchors.fill: parent; currentIndex: tabBar.currentIndex }
+                    MyStackLayout { id: stackLayout; anchors.fill: parent; currentIndex: tabBar.currentIndex }
                 }
                 //TEMPERATURE RECTANGLE
                 TempRect { id: tempRect }
@@ -408,7 +407,8 @@ Window {
         target: _backend
         onDataChanged: list.model = _backend.qml_names
         onPhotoChanged: {
-            photo.source = "image://_provider/image" + Math.random()
+            // if we want crosses, we need to change id so provider will paint crosses
+            photo.source = stackLayout.crossesActivated() ? ("image://_provider/image_painted" + Math.random()) : ("image://_provider/image" + Math.random())
             photoFrame.originalPhotoFrameWidth = photoFrame.width
             photoFrame.originalPhotoFrameHeight = photoFrame.height
             photoFrame.width = info.visible ? photo.paintedWidth : photoFrame.width
@@ -450,7 +450,7 @@ Window {
                 paletteBox.currentIndex = paletteBox.model.indexOf(paletteName);
             }
         }
-        onSourceError:
-            errorDialog.open()
+        onSourceError: errorDialog.open()
+        onActivated: mainLayout.enabled = true
     }
 }

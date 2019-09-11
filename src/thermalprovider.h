@@ -3,6 +3,7 @@
 
 #include <QQuickImageProvider>
 #include <QImage>
+#include <QPainter>
 #include <QUrl>
 #include <QDebug>
 #include <center.h>

@@ -12,44 +12,46 @@ Rectangle {
         xpos.text = x
         ypos.text = y
     }
-
     RowLayout {
         width: parent.width
         height: parent.height /2
         anchors.top: parent.top
         ColumnLayout {
-            Layout.fillHeight: parent
             Layout.preferredWidth: 100
             Layout.alignment: Qt.AlignLeft
-            Text { id: tempLabel; text: "Temperature:"; font.bold: true; color: "black" }
-            Text { text: "RAW:"; font.bold: true; color: "black" }
+            Layout.fillWidth:  true
+            Text { text: "X coordinate:"; font.bold: true; color: "black" }
+            Text { text: "Y cooodinate:"; font.bold: true; color: "black" }
         }
+        Item { Layout.preferredWidth: 50 }
         ColumnLayout {
-            Layout.fillHeight: parent
-            Layout.preferredWidth: 60
+            Layout.preferredWidth: 100
             Layout.alignment: Qt.AlignLeft
-            Text { id: tempText; color: "black" }
-            Text { id: rawText; color: "black" }
+            Layout.fillWidth:  true
+            Text { id: xpos; color: "black" }
+            Text { id: ypos; color: "black" }
         }
     }
+
     RowLayout {
         width: parent.width
         height: parent.height /2
         anchors.bottom: parent.bottom
         ColumnLayout {
-            Layout.fillHeight: parent
             Layout.preferredWidth: 100
             Layout.alignment: Qt.AlignLeft
-            Text { text: "X:"; font.bold: true; color: "black" }
-            Text { text: "Y:"; font.bold: true; color: "black" }
+            Layout.fillWidth:  true
+            Text { id: tempLabel; text: "Temperature:"; font.bold: true; color: "black" }
+            Text { text: "Radiometric value:"; font.bold: true; color: "black" }
+
         }
+        Item { Layout.preferredWidth: 40 }
         ColumnLayout {
-            Layout.fillHeight: parent
-            Layout.preferredWidth: 60
+            Layout.preferredWidth: 100
+            Layout.fillWidth:  true
             Layout.alignment: Qt.AlignLeft
-            Layout.margins: 5
-            Text { id: xpos; color: "black" }
-            Text { id: ypos; color: "black" }
+            Text { id: tempText; color: "black" }
+            Text { id: rawText; color: "black" }
         }
     }
 }
